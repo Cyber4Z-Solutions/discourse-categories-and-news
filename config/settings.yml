@@ -1,0 +1,3 @@
+plugins:
+  categories_and_news_category:
+    default: 'news'
