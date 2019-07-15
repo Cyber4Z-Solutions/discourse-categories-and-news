@@ -2,7 +2,7 @@
 
 # name: categories-and-news
 # about: Custom categories view with news carousel
-# version: 1.0
+# version: 1.1
 # authors: Ralph Rooding
 # url: https://github.com/kabisa/discourse-categories-and-news
 
@@ -14,7 +14,11 @@ register_asset 'stylesheets/common/categories-and-news.scss'
 after_initialize do
   SiteSetting.always_include_topic_excerpts = true
 
-  NEWS_CATEGORY_STYLE = { name: 'category_page_style.categories_and_news', value: 'categories_and_news' }
+  NEWS_CATEGORY_STYLE = {
+    name: 'category_page_style.categories_and_news',
+    value: 'categories_and_news'
+  }.freeze
+
   require_dependency 'category_page_style'
   class ::CategoryPageStyle
     class << self
@@ -29,7 +33,7 @@ after_initialize do
   end
 
   Discourse::Application.routes.prepend do
-    get "categories_and_news" => "categories#categories_and_news"
+    get 'categories_and_news' => 'categories#categories_and_news'
   end
 
   # Temporary until max length configurable
@@ -44,7 +48,10 @@ after_initialize do
   class ::CategoryList
     def prune_excluded_categories
       return unless @options[:exclude_category_ids]
-      @categories.delete_if { |c| @options[:exclude_category_ids].include?(c.id) }
+
+      @categories.delete_if do |c|
+        @options[:exclude_category_ids].include?(c.id)
+      end
     end
   end
 
@@ -53,18 +60,20 @@ after_initialize do
     def categories_and_news
       discourse_expires_in 1.minute
 
-      category_id = Category.where(slug: SiteSetting.categories_and_news_category).pluck(:id).first
+      category_id = Category
+                    .where(slug: SiteSetting.categories_and_news_category)
+                    .pluck(:id).first
 
       category_options = {
-        is_homepage: current_homepage == "categories".freeze,
+        is_homepage: current_homepage == 'categories',
         parent_category_id: params[:parent_category_id],
         include_topics: true,
         exclude_category_ids: [category_id]
       }
 
       topic_options = {
-        per_page: SiteSetting.categories_topics, # Replace wirth setting
-        no_definitions: true, # Nodig?
+        per_page: SiteSetting.categories_topics,
+        no_definitions: true,
         category: category_id
       }
 
@@ -77,7 +86,7 @@ after_initialize do
       draft_sequence = DraftSequence.current(current_user, draft_key)
       draft = Draft.get(current_user, draft_key, draft_sequence) if current_user
 
-      %w{category topic}.each do |type|
+      %w[category topic].each do |type|
         result.public_send(:"#{type}_list").draft = draft
         result.public_send(:"#{type}_list").draft_key = draft_key
         result.public_send(:"#{type}_list").draft_sequence = draft_sequence
