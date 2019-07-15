@@ -2,7 +2,7 @@
 
 # name: categories-and-news
 # about: Custom categories view with news carousel
-# version: 1.1
+# version: 1.2
 # authors: Ralph Rooding
 # url: https://github.com/kabisa/discourse-categories-and-news
 
