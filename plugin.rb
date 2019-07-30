@@ -73,6 +73,7 @@ after_initialize do
 
       topic_options = {
         per_page: SiteSetting.categories_topics,
+        limit: 5,
         no_definitions: true,
         category: category_id
       }
